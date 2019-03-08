@@ -8,7 +8,6 @@ import json
 from multiprocessing import Process
 
 all_ps_moves = ps_moves_per_loc()
-complied = False
 
 
 class Match:
@@ -53,15 +52,6 @@ class Match:
                                    'keys': [], 'moves': [], 'state': self.state, 'fen': self.fen}
         self.key = None
         self.trace = []
-        global DEBUG, complied
-        if DEBUG and not complied:
-            inp = input('Debug is on, logs will be overwritten. Continue with debug on? y/n: ')
-            if inp != 'y':
-                DEBUG = False
-            complied = True
-        if DEBUG:
-            logging.basicConfig(filename='game_data{}.log'.format(count), level=logging.DEBUG, filemode='w')
-            self.logger = logging.getLogger()
         self.set_all_ps_moves()
 
     def is_in_black_ps_moves(self, move):
@@ -204,7 +194,10 @@ class Match:
         :type color: str
         """
         def kings_move_is_dangerous():
-            """Is called if the move is in the opponent's pseudo moves."""
+            """
+            Is called if the move is in the opponent's pseudo moves.
+            If move would result in check, does not add to leg_moves.
+            """
             attackers, lines = self.get_king_targeting_lines(color, loc=move)
             row = piece_locations[key][0]
             col = piece_locations[key][1]
@@ -998,53 +991,34 @@ class Match:
 
 
 def rerun_game(fn='del_inv_pieces.json'):
+    """
+    Rerun a saved game from given json file.
+    :param fn: json file name
+    :type fn: str
+    """
     with open(fn, 'r') as f:
         data = json.load(f)
         board, turn = load_fen(data['fen'])
-        a = Match(state=board, turn=turn, bcqs=data['bcc']['qs'])
-        i = 0
+        match = Match(state=board, turn=turn, bcqs=data['bcc']['qs'])
         for piece_key, move in zip(data['keys'], data['moves']):
-            if piece_key == 'R1':
-                breakpoint()
-            a.make_move(tuple(move), piece_key)
-            # if i > 25:
-            #     breakpoint()
-            i += 1
-
-
-def run_simulation_test():
-    b = Board()
-    a = Match(state=b.board)
-    a.simulate()
-    del a
+            match.make_move(tuple(move), piece_key)
 
 
 def random_game(board, turn, white_can_castle, black_can_castle):
+    """
+    Plays random chess game from given board, returns winner.
+    :param board: board to start game from
+    :param turn: next side to move, 'black' or 'white'
+    :param white_can_castle: castling availability for white
+    :param black_can_castle: castling availability for black
+    :type board: tuple[list]
+    :type turn: str
+    :type white_can_castle: dict
+    :type black_can_castle: dict
+    :return: winner
+    :rtype: str, None
+    """
     wcks, wcqs = white_can_castle['ks'], white_can_castle['qs']
     bcks, bcqs = black_can_castle['ks'], black_can_castle['qs']
     match = Match(state=board, turn=turn, wcks=wcks, wcqs=wcqs, bcks=bcks, bcqs=bcqs)
     return match.simulate()
-
-
-def check_board(state):
-    board = state
-    a = Match(state=board, turn='black')
-
-
-def chess_sim_multiprocess(num_procs=5):
-    procs = []
-    for p in range(num_procs):
-        proc = Process(target=run_simulation_test)
-        procs.append(proc)
-    for proc in procs:
-        proc.start()
-    for proc in procs:
-        proc.join()
-
-
-DEBUG = False
-
-
-if __name__ == '__main__':
-    rerun_game(fn='..\del_inv_pieces.json')
-

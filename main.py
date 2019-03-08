@@ -25,11 +25,16 @@ def measure_time(func, args=False, num_runs=1000):
 
 
 def dynamic_save(origin):
+    """
+    First saves walked nodes to db then trains again.
+    :param origin: chess game tree
+    :type origin: Origin
+    """
     origin.save_walk(settings.walked_nodes)
     origin.train()
 
 
-def main(load=True, p_runtime=True, sync=True, n=999999999999):
+def main(load=False, p_runtime=True, sync=True, n=999999999999):
     """
     Creates game tree root and trains for n rounds.
     :param load: loads database to tree if true

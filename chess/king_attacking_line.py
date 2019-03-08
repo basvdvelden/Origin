@@ -8,12 +8,20 @@ class DangerLines(list):
         self.king_attacker = None
 
     def delete_line(self, key):
+        """
+        Deletes self[key], and removes key from self.keys.
+        :param key: piece to delete moves of.
+        :type key: str
+        """
         for i, line in enumerate(self):
             if line.key == key:
                 self.keys.discard(self[i].key)
                 del self[i]
 
     def delete_lines(self):
+        """
+        King's location changed so we delete the lines no longer attacking the king.
+        """
         for i, line in enumerate(self):
             if self.king_loc not in line:
                 self.keys.discard(self[i].key)
@@ -21,6 +29,11 @@ class DangerLines(list):
                 self.delete_lines()
 
     def king_moved(self, new_loc):
+        """
+        Sets self.king_loc to given location.
+        :param new_loc: new location of king
+        :type new_loc: tuple
+        """
         self.king_loc = new_loc
         self.delete_lines()
 

@@ -1,10 +1,12 @@
 """
-Class Board
-Tuple object of starting board for chess as a tuple of 8 lists with length 8.
+Chess board
 """
 
 
 class Board:
+    """
+    8 x 8 tuple of lists representing a chess board.
+    """
     def __init__(self):
         self.board = [[1] * 8 for i in range(8)]
         self.board = tuple(self.board)
