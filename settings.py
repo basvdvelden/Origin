@@ -1,14 +1,8 @@
-"""Settings for training algorithm variables, saving intervals and parallel training"""
 WIN = 2
 DRAW = 0.25
 NUM_SIMULATIONS = 1
-SAVE_INTERVAL_MIN = 5
 C = 2
-PRINT_RUNTIME = False
-PRINT_AVG_RUNTIME = True
-SAVE_MOMENTS = [n for n in range(0, 60, SAVE_INTERVAL_MIN)]
 VISITS = NUM_SIMULATIONS
-MULTI_PROCESSING = False
 walked_nodes = []
 path = []
 tot_n = 0
